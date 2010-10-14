@@ -34,6 +34,7 @@
 %define with_xen_proxy     0%{!?_without_xen_proxy:%{server_drivers}}
 %define with_qemu          0%{!?_without_qemu:%{server_drivers}}
 %define with_openvz        0%{!?_without_openvz:%{server_drivers}}
+%define with_vserver       0%{!?_without_vserver:%{server_drivers}}
 %define with_lxc           0%{!?_without_lxc:%{server_drivers}}
 %define with_vbox          0%{!?_without_vbox:%{server_drivers}}
 %define with_uml           0%{!?_without_uml:%{server_drivers}}
@@ -83,9 +84,10 @@
 %define with_numactl 0
 %endif
 
-# RHEL doesn't ship OpenVZ, VBox, UML, OpenNebula, PowerHypervisor or ESX
+# RHEL doesn't ship OpenVZ, VServer, VBox, UML, OpenNebula, PowerHypervisor or ESX
 %if 0%{?rhel}
 %define with_openvz 0
+%define with_vserver 0
 %define with_vbox 0
 %define with_uml 0
 %define with_one 0
@@ -437,6 +439,10 @@ of recent versions of Linux (and other OSes).
 %define _without_openvz --without-openvz
 %endif
 
+%if ! %{with_vserver}
+%define _without_vserver --without-vserver
+%endif
+
 %if ! %{with_lxc}
 %define _without_lxc --without-lxc
 %endif
@@ -548,6 +554,7 @@ of recent versions of Linux (and other OSes).
 %configure %{?_without_xen} \
            %{?_without_qemu} \
            %{?_without_openvz} \
+           %{?_without_vserver} \
            %{?_without_lxc} \
            %{?_without_vbox} \
            %{?_without_sasl} \
