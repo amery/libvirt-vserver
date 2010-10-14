@@ -217,6 +217,8 @@ AC_ARG_WITH([uml],
   AC_HELP_STRING([--with-uml], [add UML support @<:@default=check@:>@]),[],[with_uml=check])
 AC_ARG_WITH([openvz],
   AC_HELP_STRING([--with-openvz], [add OpenVZ support @<:@default=yes@:>@]),[],[with_openvz=yes])
+AC_ARG_WITH([vserver],
+  AC_HELP_STRING([--with-vserver], [add VServer support @<:@default=check@:>@]),[],[with_vserver=check])
 AC_ARG_WITH([libssh2],
   AC_HELP_STRING([--with-libssh2=@<:@PFX@:>@], [libssh2 location @<:@default=/usr/local/lib@:>@]),[],[with_libssh2=yes])
 AC_ARG_WITH([phyp],
@@ -306,6 +308,30 @@ if test "$with_openvz" = "yes"; then
 fi
 AM_CONDITIONAL([WITH_OPENVZ], [test "$with_openvz" = "yes"])
 
+dnl
+dnl check for linux-vserver
+dnl
+
+VSERVER_CFLAGS=
+VSERVER_LIBS=
+if test "x$with_vserver" = "xyes" || test "x$with_vserver" = "xcheck"; then
+    PKG_CHECK_MODULES(VSERVER, util-vserver,
+      [with_vserver=yes], [
+      if test "x$with_vserver" = "xcheck" ; then
+          with_vserver=no
+      else
+          AC_MSG_ERROR(
+           [You must install util-vserver to compile libvirt linux-vserver driver]
+	    )
+      fi
+    ])
+    if test "x$with_vserver" = "xyes" ; then
+        AC_DEFINE_UNQUOTED([WITH_VSERVER], 1, [whether VServer driver is enabled])
+    fi
+fi
+AM_CONDITIONAL([WITH_VSERVER], [test "$with_vserver" = "yes"])
+AC_SUBST([VSERVER_CFLAGS])
+AC_SUBST([VSERVER_LIBS])
 
 dnl
 dnl check for XDR
@@ -2197,6 +2223,7 @@ AC_MSG_NOTICE([   Proxy: $with_xen_proxy])
 AC_MSG_NOTICE([    QEMU: $with_qemu])
 AC_MSG_NOTICE([     UML: $with_uml])
 AC_MSG_NOTICE([  OpenVZ: $with_openvz])
+AC_MSG_NOTICE([ VServer: $with_vserver])
 AC_MSG_NOTICE([    VBox: $with_vbox])
 AC_MSG_NOTICE([  XenAPI: $with_xenapi])
 AC_MSG_NOTICE([     LXC: $with_lxc])
