@@ -65,6 +65,9 @@
 # ifdef WITH_XENAPI
 #  include "xenapi/xenapi_driver.h"
 # endif
+# ifdef WITH_VSERVER
+#  include "vserver/vserver_driver.h"
+# endif
 #endif
 
 #define VIR_FROM_THIS VIR_FROM_NONE
@@ -361,6 +364,7 @@ virInitialize(void)
     virDriverLoadModule("vbox");
     virDriverLoadModule("esx");
     virDriverLoadModule("xenapi");
+    virDriverLoadModule("vserver");
     virDriverLoadModule("remote");
 #else
 # ifdef WITH_TEST
@@ -383,6 +387,9 @@ virInitialize(void)
 # endif
 # ifdef WITH_XENAPI
     if (xenapiRegister() == -1) return -1;
+# endif
+# ifdef WITH_VSERVER
+    if (vserverRegister() == -1) return -1;
 # endif
 # ifdef WITH_REMOTE
     if (remoteRegister () == -1) return -1;
@@ -1123,6 +1130,10 @@ virGetVersion(unsigned long *libVer, const char *type,
 # endif
 # if WITH_XENAPI
         if (STRCASEEQ(type, "XenAPI"))
+            *typeVer = LIBVIR_VERSION_NUMBER;
+# endif
+# if WITH_VSERVER
+        if (STRCASEEQ(type, "VServer"))
             *typeVer = LIBVIR_VERSION_NUMBER;
 # endif
 # if WITH_REMOTE
