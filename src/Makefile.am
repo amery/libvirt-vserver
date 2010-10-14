@@ -259,6 +259,9 @@ OPENVZ_DRIVER_SOURCES =						\
 		openvz/openvz_conf.c openvz/openvz_conf.h	\
 		openvz/openvz_driver.c openvz/openvz_driver.h
 
+VSERVER_DRIVER_SOURCES =					\
+	vserver/vserver_driver.c vserver/vserver_driver.h
+
 VBOX_DRIVER_SOURCES =						\
         vbox/vbox_XPCOMCGlue.c vbox/vbox_XPCOMCGlue.h		\
         vbox/vbox_driver.c vbox/vbox_driver.h			\
@@ -595,6 +598,24 @@ if WITH_DRIVER_MODULES
 libvirt_driver_openvz_la_LDFLAGS = -module -avoid-version $(AM_LDFLAGS)
 endif
 libvirt_driver_openvz_la_SOURCES = $(OPENVZ_DRIVER_SOURCES)
+endif
+
+if WITH_VSERVER
+if WITH_DRIVER_MODULES
+mod_LTLIBRARIES += libvirt_driver_vserver.la
+else
+noinst_LTLIBRARIES += libvirt_driver_vserver.la
+libvirt_la_BUILT_LIBADD += libvirt_driver_vserver.la
+endif
+libvirt_driver_vserver_la_CFLAGS =				\
+		$(VSERVER_CFLAGS)				\
+		-I@top_srcdir@/src/conf $(AM_CFLAGS)
+libvirt_driver_vserver_la_LDFLAGS = $(AM_LDFLAGS)
+libvirt_driver_vserver_la_LIBADD = $(VSERVER_LIBS)
+if WITH_DRIVER_MODULES
+libvirt_driver_vserver_la_LDFLAGS += -module -avoid-version
+endif
+libvirt_driver_vserver_la_SOURCES = $(VSERVER_DRIVER_SOURCES)
 endif
 
 if WITH_VBOX
